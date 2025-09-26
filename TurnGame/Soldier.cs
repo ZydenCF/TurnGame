@@ -8,18 +8,20 @@ namespace TurnGame
 {
     class Soldier : Unit
     {
-        internal Soldier() : base(30, 10) { }
-
+        internal Soldier() : base(30, 15) { } 
 
         public override void Attack(Base targetBase, List<IUnit> enemyUnits)
         {
-            if (enemyUnits.Count > 0)
+            var aliveEnemies = enemyUnits.Where(u => u.IsAlive()).ToList();
+            if (aliveEnemies.Count > 0)
             {
-                enemyUnits[0].TakeDamage(damage);
+                aliveEnemies[0].TakeDamage(damage);
+                Console.WriteLine($"Soldier attacks enemy unit for {damage} damage!");
             }
             else
             {
                 targetBase.TakeDamage(damage);
+                Console.WriteLine($"Soldier attacks enemy base for {damage} damage! Base health: {targetBase.GetHealth()}");
             }
         }
     }

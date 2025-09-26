@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace TurnGame
 {
-    interface IUnit : IAttacker
+    interface IUnit
     {
         bool IsAlive();
         void TakeDamage(int amount);
+        void Attack(Base targetBase, List<IUnit> enemyUnits);
     }
 }

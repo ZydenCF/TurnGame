@@ -6,10 +6,15 @@ using System.Threading.Tasks;
 
 namespace TurnGame
 {
-    internal class Program
+    class Program
     {
         static void Main(string[] args)
         {
+            GameManager game = new GameManager();
+            game.Run();
+
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey();
         }
     }
 }
