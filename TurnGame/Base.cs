@@ -10,12 +10,10 @@ namespace TurnGame
     {
         private int health;
 
-
         internal Base()
         {
             health = 100;
         }
-
 
         internal void TakeDamage(int dmg)
         {
@@ -26,12 +24,10 @@ namespace TurnGame
             }
         }
 
-
         internal bool IsAlive()
         {
             return health > 0;
         }
-
 
         internal int GetHealth()
         {

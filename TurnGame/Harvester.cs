@@ -10,14 +10,14 @@ namespace TurnGame
     {
         internal Harvester() : base(20, 0) { }
 
-
         public override void Attack(Base targetBase, List<IUnit> enemyUnits)
         {
+            
         }
 
         internal int Collect()
         {
-            return 10;
+            return 15;
         }
     }
 }

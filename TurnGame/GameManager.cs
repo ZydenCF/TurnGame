@@ -17,7 +17,6 @@ namespace TurnGame
         private Dictionary<string, int> unitCosts;
         private int turnCounter;
 
-
         internal GameManager()
         {
             playerUnits = new List<IUnit>();
@@ -25,37 +24,42 @@ namespace TurnGame
             bases = new Base[2];
             bases[0] = new Base(); 
             bases[1] = new Base(); 
-            playerResources = 50;
+            playerResources = 100; 
             buildQueue = new Queue<BuildRequest>();
             history = new Stack<string>();
             unitCosts = new Dictionary<string, int>();
-            unitCosts["Soldier"] = 20;
-            unitCosts["Harvester"] = 15;
+            unitCosts["Soldier"] = 15; 
+            unitCosts["Harvester"] = 10; 
             turnCounter = 0;
         }
 
         internal void Run()
         {
+          
+            Console.WriteLine("The soldier costs 15 resources, the harvester costs 10 resources.");
+            Console.WriteLine();
+
             while (bases[0].IsAlive() && bases[1].IsAlive())
             {
                 turnCounter = turnCounter + 1;
-                Console.WriteLine("--- Turn " + turnCounter + " ---");
-
+                Console.WriteLine("=== Turn " + turnCounter + " ===");
+                Console.WriteLine($"Player Base Health: {bases[0].GetHealth()}, Enemy Base Health: {bases[1].GetHealth()}");
 
                 PlayerTurn();
                 if (!bases[1].IsAlive())
                 {
-                    Console.WriteLine("Player wins!");
+                    Console.WriteLine("WINNER");
                     break;
                 }
-
 
                 EnemyTurn();
                 if (!bases[0].IsAlive())
                 {
-                    Console.WriteLine("Enemy wins!");
+                    Console.WriteLine("LOSER");
                     break;
                 }
+
+                Console.WriteLine();
             }
         }
 
@@ -70,14 +74,37 @@ namespace TurnGame
                     playerResources = playerResources + h.Collect();
                 }
             }
-            Console.WriteLine("Player resources: " + playerResources);
 
+            
+            int alivePlayers = playerUnits.Count(u => u.IsAlive());
+            int aliveEnemies = enemyUnits.Count(u => u.IsAlive());
+            Console.WriteLine($"Player resources: {playerResources}");
+            Console.WriteLine($"Your alive units: {alivePlayers}, Enemy alive units: {aliveEnemies}");
 
-           
+            
+            if (buildQueue.Count > 0)
+            {
+                BuildRequest req = buildQueue.Peek();
+                req.ProgressTurn();
+                if (req.IsReady())
+                {
+                    buildQueue.Dequeue();
+                    if (req.UnitType == "Soldier")
+                    {
+                        playerUnits.Add(new Soldier());
+                        Console.WriteLine("¡Soldier filled!");
+                    }
+                    else if (req.UnitType == "Harvester")
+                    {
+                        playerUnits.Add(new Harvester());
+                        Console.WriteLine("¡Harvester filled!");
+                    }
+                }
+            }
+
+            
             Console.WriteLine("Choose unit to build (1 = Soldier, 2 = Harvester, other = skip):");
             string choice = Console.ReadLine();
-
-
             switch (choice)
             {
                 case "1":
@@ -91,31 +118,8 @@ namespace TurnGame
                     break;
             }
 
-
             
-            if (buildQueue.Count > 0)
-            {
-                BuildRequest req = buildQueue.Peek();
-                req.ProgressTurn();
-                if (req.IsReady())
-                {
-                    buildQueue.Dequeue();
-                    if (req.UnitType == "Soldier")
-                    {
-                        playerUnits.Add(new Soldier());
-                        Console.WriteLine("Soldier completed!");
-                    }
-                    else if (req.UnitType == "Harvester")
-                    {
-                        playerUnits.Add(new Harvester());
-                        Console.WriteLine("Harvester completed!");
-                    }
-                }
-            }
-
-
-            
-            foreach (IUnit u in playerUnits)
+            foreach (IUnit u in playerUnits.ToList())
             {
                 if (u.IsAlive())
                 {
@@ -123,6 +127,9 @@ namespace TurnGame
                 }
             }
 
+            
+            playerUnits.RemoveAll(u => !u.IsAlive());
+            enemyUnits.RemoveAll(u => !u.IsAlive());
 
             history.Push("Player turn completed");
         }
@@ -141,7 +148,6 @@ namespace TurnGame
             }
         }
 
-
         private void EnemyTurn()
         {
             int unitsToBuild = Fibonacci(turnCounter);
@@ -151,8 +157,8 @@ namespace TurnGame
             }
             Console.WriteLine("Enemy builds " + unitsToBuild + " soldiers.");
 
-
-            foreach (IUnit u in enemyUnits)
+            
+            foreach (IUnit u in enemyUnits.ToList())
             {
                 if (u.IsAlive())
                 {
@@ -160,20 +166,24 @@ namespace TurnGame
                 }
             }
 
+            
+            playerUnits.RemoveAll(u => !u.IsAlive());
+            enemyUnits.RemoveAll(u => !u.IsAlive());
 
             history.Push("Enemy turn completed");
         }
+
         private int Fibonacci(int n)
         {
             if (n <= 0) return 0;
             if (n == 1) return 0;
             if (n == 2) return 1;
+
             int a = 0;
             int b = 1;
-            int c = 0;
             for (int i = 3; i <= n; i++)
             {
-                c = a + b;
+                int c = a + b;
                 a = b;
                 b = c;
             }
